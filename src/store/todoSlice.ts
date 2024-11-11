@@ -1,11 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Todo } from '../types';
-
-interface TodoState {
-  todos: Todo[];
-  loading: boolean;
-  error: string | null;
-}
+import { Todo, TodoState } from '../types/todo';
 
 const initialState: TodoState = {
   todos: [],
@@ -18,26 +12,22 @@ const todoSlice = createSlice({
   initialState,
   reducers: {
     addTodo: (state, action: PayloadAction<Todo>) => {
-      state.todos.unshift(action.payload);
+      state.todos.push(action.payload);
+    },
+    updateTodo: (state, action: PayloadAction<Todo>) => {
+      const index = state.todos.findIndex(todo => todo.id === action.payload.id);
+      if (index !== -1) {
+        state.todos[index] = action.payload;
+      }
+    },
+    deleteTodo: (state, action: PayloadAction<string>) => {
+      state.todos = state.todos.filter(todo => todo.id !== action.payload);
     },
     toggleTodo: (state, action: PayloadAction<string>) => {
       const todo = state.todos.find(todo => todo.id === action.payload);
       if (todo) {
         todo.completed = !todo.completed;
-        todo.updatedAt = new Date().toISOString();
       }
-    },
-    updateTodo: (state, action: PayloadAction<Todo>) => {
-      const index = state.todos.findIndex(todo => todo.id === action.payload.id);
-      if (index !== -1) {
-        state.todos[index] = {
-          ...action.payload,
-          updatedAt: new Date().toISOString(),
-        };
-      }
-    },
-    deleteTodo: (state, action: PayloadAction<string>) => {
-      state.todos = state.todos.filter(todo => todo.id !== action.payload);
     },
     setTodos: (state, action: PayloadAction<Todo[]>) => {
       state.todos = action.payload;
@@ -45,5 +35,5 @@ const todoSlice = createSlice({
   },
 });
 
-export const { addTodo, toggleTodo, updateTodo, deleteTodo, setTodos } = todoSlice.actions;
+export const { addTodo, updateTodo, deleteTodo, toggleTodo, setTodos } = todoSlice.actions;
 export default todoSlice.reducer; 
