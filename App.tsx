@@ -6,14 +6,21 @@
  */
 
 import React from 'react';
+import { Provider } from 'react-redux';
+import { NavigationContainer } from '@react-navigation/native';
+import { store } from './src/store';
 import { TodoProvider } from './src/context/TodoContext';
-import { TodoList } from './src/screens/TodoList';
+import AppNavigator from './src/navigation/AppNavigator';
 
 const App = () => {
   return (
-    <TodoProvider>
-      <TodoList />
-    </TodoProvider>
+    <Provider store={store}>
+      <NavigationContainer>
+        <TodoProvider>
+          <AppNavigator />
+        </TodoProvider>
+      </NavigationContainer>
+    </Provider>
   );
 };
 
