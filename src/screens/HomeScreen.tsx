@@ -3,10 +3,12 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
-import TodoList from '../components/common/TodoList';
-import { loadTodos } from '../utils/storage';
+import { TodoList } from './TodoList';
+import { loadTodos, storeTodos } from '../utils/storage';
 import { setTodos } from '../store/todoSlice';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -14,6 +16,7 @@ type HomeScreenProps = {
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const dispatch = useDispatch();
+  const todos = useSelector((state: RootState) => state.todos.todos);
 
   useEffect(() => {
     const fetchTodos = async () => {
@@ -23,12 +26,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     fetchTodos();
   }, [dispatch]);
 
+  // Save todos whenever they change
+  useEffect(() => {
+    storeTodos(todos);
+  }, [todos]);
+
   return (
     <View style={styles.container}>
-      <TodoList onEditTodo={(todo) => navigation.navigate('AddTodo', { todo })} />
+      <TodoList />
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => navigation.navigate('AddTodo')}
+        onPress={() => navigation.navigate('AddTodo', { todo: undefined })}
       >
         <Icon name="add" size={24} color="white" />
       </TouchableOpacity>
@@ -39,26 +47,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F2F2F7',
   },
   fab: {
     position: 'absolute',
     right: 16,
     bottom: 16,
-    backgroundColor: '#f4511e',
+    backgroundColor: '#007AFF',
     width: 56,
     height: 56,
     borderRadius: 28,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
     elevation: 4,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowRadius: 4,
   },
 });
 
